@@ -1,0 +1,128 @@
+{
+  "temel_model": "Lojistik regresyon",
+  "veri": {
+    "egitim": 5634,
+    "test": 1409,
+    "egitim_kayip_orani": 0.2653532126375577,
+    "test_kayip_orani": 0.2654364797728886
+  },
+  "rastgele_tohum": 42,
+  "secilen_esik": 0.32802520263812535,
+  "risk_gruplari": {
+    "Yüksek": ">= 0.328",
+    "Orta": ">= 0.164",
+    "Düşük": "< 0.164"
+  },
+  "en_iyi_parametreler": {
+    "Lojistik regresyon": {
+      "model__C": 10
+    },
+    "Karar ağacı": {
+      "model__max_depth": 8,
+      "model__min_samples_leaf": 100
+    }
+  },
+  "capraz_dogrulama": {
+    "Lojistik regresyon": {
+      "roc_auc": 0.846153886692662,
+      "pr_auc": 0.6592149657722624,
+      "kesinlik": 0.6558781618591262,
+      "duyarlilik": 0.5585284280936454,
+      "f1": 0.6028296558367252,
+      "dogruluk": 0.8051133095140905
+    },
+    "Karar ağacı": {
+      "roc_auc": 0.8333327858151108,
+      "pr_auc": 0.6277871873803418,
+      "kesinlik": 0.6455747661978577,
+      "duyarlilik": 0.49096989966555177,
+      "f1": 0.5571744600009025,
+      "dogruluk": 0.7930438249900315
+    }
+  },
+  "test": {
+    "Lojistik regresyon": {
+      "roc_auc": 0.8406649616368287,
+      "pr_auc": 0.6296827882039809,
+      "brier": 0.13879025210746865,
+      "esik_0_50": {
+        "esik": 0.5,
+        "dogruluk": 0.7977288857345636,
+        "kesinlik": 0.6403785488958991,
+        "duyarlilik": 0.5427807486631016,
+        "f1": 0.5875542691751086,
+        "karisiklik_matrisi": [
+          [
+            921,
+            114
+          ],
+          [
+            171,
+            203
+          ]
+        ]
+      },
+      "secilen_esik": {
+        "esik": 0.328,
+        "dogruluk": 0.7629524485450674,
+        "kesinlik": 0.5390625,
+        "duyarlilik": 0.7379679144385026,
+        "f1": 0.6230248306997742,
+        "karisiklik_matrisi": [
+          [
+            799,
+            236
+          ],
+          [
+            98,
+            276
+          ]
+        ]
+      }
+    },
+    "Karar ağacı": {
+      "roc_auc": 0.8342142654163116,
+      "pr_auc": 0.6142352619187208,
+      "brier": 0.13991348648514482,
+      "esik_0_50": {
+        "esik": 0.5,
+        "dogruluk": 0.7984386089425124,
+        "kesinlik": 0.6666666666666666,
+        "duyarlilik": 0.48128342245989303,
+        "f1": 0.5590062111801242,
+        "karisiklik_matrisi": [
+          [
+            945,
+            90
+          ],
+          [
+            194,
+            180
+          ]
+        ]
+      },
+      "secilen_esik": {
+        "esik": 0.3,
+        "dogruluk": 0.7544357700496807,
+        "kesinlik": 0.5269230769230769,
+        "duyarlilik": 0.732620320855615,
+        "f1": 0.6129753914988815,
+        "karisiklik_matrisi": [
+          [
+            789,
+            246
+          ],
+          [
+            100,
+            274
+          ]
+        ]
+      }
+    }
+  },
+  "surumler": {
+    "scikit-learn": "1.9.1",
+    "pandas": "3.0.6",
+    "numpy": "2.5.3"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "onerilen_plan": {
+    "butce": 10000,
+    "harcama": 9999.23,
+    "kalan": 0.7700000000004366,
+    "kullanim_orani": 0.999923,
+    "teklif_sunulan_musteri": 223,
+    "teklif_dagilimi": {
+      "İndirim": 57,
+      "Uygun paket": 16,
+      "Teknik destek": 150
+    },
+    "beklenen_ek_katki": 21584.218353570122,
+    "beklenen_net_fayda": 11584.988353570123,
+    "varsayima_duyarli_teklif": 68,
+    "butce_disinda_kalan": 248
+  },
+  "kisitsiz_plan": {
+    "teklif_sunulan_musteri": 471,
+    "maliyet": 20357.379999999997,
+    "beklenen_net_fayda": 16035.693916737604,
+    "teklif_dagilimi": {
+      "İndirim": 112,
+      "Uygun paket": 46,
+      "Teknik destek": 313
+    }
+  },
+  "portfoy_yillik_gelir": 1083614.4
+}
