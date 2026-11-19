@@ -42,13 +42,16 @@ OZELLIK_ADI = {
     "DeviceProtection": "Cihaz koruma", "TechSupport": "Teknik destek", "StreamingTV": "TV yayını",
     "StreamingMovies": "Film yayını", "PaperlessBilling": "Kâğıtsız fatura",
     "PhoneService": "Telefon hizmeti", "MultipleLines": "Çoklu hat",
+    "gender": "Cinsiyet", "SeniorCitizen": "Yaş grubu",
 }
+YAS_GRUBU = {0: "65 yaş altı", 1: "65 yaş ve üzeri"}
 DEGER_ADI = {
     "Month-to-month": "aylık (taahhütsüz)", "One year": "1 yıllık", "Two year": "2 yıllık",
     "Fiber optic": "fiber", "Yes": "var", "No": "yok",
     "No internet service": "internet yok", "No phone service": "telefon yok",
     "Electronic check": "elektronik çek", "Mailed check": "posta çeki",
     "Bank transfer (automatic)": "otomatik banka havalesi", "Credit card (automatic)": "otomatik kredi kartı",
+    "Female": "kadın", "Male": "erkek",
 }
 
 
@@ -83,6 +86,7 @@ def esik_olcutleri(y, olasilik, esik):
 def gruplara_ayir(X):
     """Kategorik sütunlar aynen, tenure ve aylık ücret aralıklara bölünmüş olarak."""
     gruplar = X[A.KATEGORIK].copy()
+    gruplar["SeniorCitizen"] = gruplar["SeniorCitizen"].map(YAS_GRUBU)
     gruplar["tenure"] = pd.cut(X["tenure"], A.SURE_SINIR, labels=A.SURE_ETIKET).astype(str)
     gruplar["MonthlyCharges"] = pd.cut(X["MonthlyCharges"], A.UCRET_SINIR, labels=A.UCRET_ETIKET, right=False).astype(str)
     return gruplar
@@ -183,21 +187,61 @@ def grup_kontrolu(test, esik):
     return pd.DataFrame(satirlar)
 
 
-def main():
-    baslik_yaz("Model")
-    df = pd.read_csv(A.TEMIZ_VERI)
+def veri_bol(veri=None):
+    """Modelleme verisini (tekrar eden kayıtlar çıkarılmış) katmanlı olarak eğitim ve test kısmına böler.
+
+    Bu işlev başka betikler (SHAP analizi, tekrar kayıt etkisi) tarafından da çağrılır; böylece
+    hepsi aynı kayıtları aynı kısımlara koyar. `veri` verilirse (karşılaştırma senaryoları için)
+    dosya yerine o tablo bölünür.
+    """
+    df = pd.read_csv(A.MODELLEME_VERISI) if veri is None else veri.reset_index(drop=True)
     X, y = df[A.SAYISAL + A.KATEGORIK], df[A.HEDEF].eq("Yes").astype(int)
     X_egitim, X_test, y_egitim, y_test = train_test_split(
         X, y, test_size=A.TEST_ORANI, stratify=y, random_state=A.RASTGELE_TOHUM)
-    katlar = StratifiedKFold(n_splits=A.CV_KAT, shuffle=True, random_state=A.RASTGELE_TOHUM)
+    return df, X_egitim, X_test, y_egitim, y_test
 
-    modeller, cv_sonuc, test_sonuc, esikler, parametreler, test_olasilik = {}, {}, {}, {}, {}, {}
+
+def guven_araligi(y, olasilik, esik, tekrar=A.BOOTSTRAP_TEKRAR):
+    """Test kısmı için yüzdelik (percentile) bootstrap %95 güven aralıkları.
+
+    Test kısmı model seçiminde kullanılmadığı için çapraz doğrulamaya sokulmaz; bunun yerine
+    aynı kayıtlar yerine koymalı yeniden örneklenerek ölçütlerin ne kadar oynadığına bakılır.
+    """
+    rastgele = np.random.default_rng(A.RASTGELE_TOHUM)
+    y, olasilik = np.asarray(y), np.asarray(olasilik)
+    degerler = {"roc_auc": [], "pr_auc": [], "kesinlik": [], "duyarlilik": []}
+    for _ in range(tekrar):
+        i = rastgele.integers(0, len(y), len(y))
+        yb, pb = y[i], olasilik[i]
+        tahmin = pb >= esik
+        degerler["roc_auc"].append(roc_auc_score(yb, pb))
+        degerler["pr_auc"].append(average_precision_score(yb, pb))
+        degerler["kesinlik"].append(precision_score(yb, tahmin, zero_division=0))
+        degerler["duyarlilik"].append(recall_score(yb, tahmin))
+    return {olcut: [float(np.percentile(d, 2.5)), float(np.percentile(d, 97.5))] for olcut, d in degerler.items()}
+
+
+def main():
+    baslik_yaz("Model")
+    df, X_egitim, X_test, y_egitim, y_test = veri_bol()
+    katlar = StratifiedKFold(n_splits=A.CV_KAT, shuffle=True, random_state=A.RASTGELE_TOHUM)
+    ic_katlar = StratifiedKFold(n_splits=A.CV_KAT, shuffle=True, random_state=A.RASTGELE_TOHUM + 1)
+
+    modeller, cv_sonuc, cv_std, test_sonuc, esikler, parametreler, test_olasilik = {}, {}, {}, {}, {}, {}, {}
+    guven, cv_satirlari = {}, []
     for ad, (model, izgara) in ADAYLAR.items():
         arama = GridSearchCV(boru_hatti(model), izgara, scoring="roc_auc", cv=katlar).fit(X_egitim, y_egitim)
         boru = arama.best_estimator_  # tüm eğitim verisiyle yeniden eğitilmiş hâli
         parametreler[ad] = arama.best_params_
-        skorlar = cross_validate(boru, X_egitim, y_egitim, cv=katlar, scoring=CV_OLCUTLERI)
+        # İç içe (nested) çapraz doğrulama: ayar seçimi de her dış katın kendi eğitim kısmında yapılır.
+        # Seçilmiş modeli aynı katlarla yeniden değerlendirmek sonucu iyimser gösterirdi (Varma ve Simon, 2006).
+        skorlar = cross_validate(GridSearchCV(boru_hatti(model), izgara, scoring="roc_auc", cv=ic_katlar),
+                                 X_egitim, y_egitim, cv=katlar, scoring=CV_OLCUTLERI, return_estimator=True)
         cv_sonuc[ad] = {olcut: float(skorlar[f"test_{olcut}"].mean()) for olcut in CV_OLCUTLERI}
+        cv_std[ad] = {olcut: float(skorlar[f"test_{olcut}"].std(ddof=1)) for olcut in CV_OLCUTLERI}
+        for kat, secilen in enumerate(skorlar["estimator"], start=1):
+            cv_satirlari.append({"model": ad, "kat": kat, **{olcut: float(skorlar[f"test_{olcut}"][kat - 1]) for olcut in CV_OLCUTLERI},
+                                 "secilen_ayar": json.dumps(secilen.best_params_, ensure_ascii=False)})
         # Eşik, eğitim verisindeki kat-dışı tahminlerden seçilir; test verisi görülmez.
         kat_disi = cross_val_predict(boru, X_egitim, y_egitim, cv=katlar, method="predict_proba")[:, 1]
         esikler[ad] = esik_sec(y_egitim, kat_disi)
@@ -211,7 +255,10 @@ def main():
             "esik_0_50": esik_olcutleri(y_test, p, 0.5),
             "secilen_esik": esik_olcutleri(y_test, p, esikler[ad]),
         }
+        guven[ad] = guven_araligi(y_test, p, esikler[ad])
 
+    A.TABLO.mkdir(parents=True, exist_ok=True)
+    pd.DataFrame(cv_satirlari).to_csv(A.CV_TABLOSU, index=False, encoding="utf-8-sig")
     esik = esikler[LOJISTIK]
     if cv_sonuc[AGAC]["roc_auc"] > cv_sonuc[LOJISTIK]["roc_auc"] + 0.01:
         print("UYARI: Karar ağacı çapraz doğrulamada belirgin biçimde daha iyi; temel model seçimini gözden geçirin.")
@@ -230,7 +277,6 @@ def main():
     risk.to_csv(A.RISK_TABLOSU, index=False, encoding="utf-8-sig")
 
     gruplar = grup_kontrolu(test, esik)
-    A.TABLO.mkdir(parents=True, exist_ok=True)
     gruplar.to_csv(A.TABLO / "grup_bazli_kontrol.csv", index=False, encoding="utf-8-sig")
 
     egri_grafikleri(y_test, test_olasilik, y_test.mean())
@@ -245,7 +291,11 @@ def main():
         "risk_gruplari": {"Yüksek": f">= {esik:.3f}", "Orta": f">= {esik / 2:.3f}", "Düşük": f"< {esik / 2:.3f}"},
         "en_iyi_parametreler": parametreler,
         "capraz_dogrulama": cv_sonuc,
+        "capraz_dogrulama_std": cv_std,
+        "capraz_dogrulama_yontemi": f"{A.CV_KAT} katlı katmanlı, iç içe (ayar seçimi iç döngüde); eşik olarak 0,50 kullanılan ölçütler",
         "test": test_sonuc,
+        "test_guven_araligi": guven,
+        "bootstrap_tekrar": A.BOOTSTRAP_TEKRAR,
         "surumler": {"scikit-learn": sklearn.__version__, "pandas": pd.__version__, "numpy": np.__version__},
     }, ensure_ascii=False, indent=2), encoding="utf-8")
 
@@ -254,8 +304,11 @@ def main():
     for ad in ADAYLAR:
         c, t, s = cv_sonuc[ad], test_sonuc[ad], test_sonuc[ad]["secilen_esik"]
         print(f"\n{ad}  {parametreler[ad]}")
-        print(f"  Çapraz doğrulama: ROC-AUC {tr(c['roc_auc'], 3)}, PR-AUC {tr(c['pr_auc'], 3)}")
-        print(f"  Test: ROC-AUC {tr(t['roc_auc'], 3)}, PR-AUC {tr(t['pr_auc'], 3)}, Brier {tr(t['brier'], 3)}")
+        print(f"  Çapraz doğrulama (iç içe, {A.CV_KAT} kat): ROC-AUC {tr(c['roc_auc'], 3)} ± {tr(cv_std[ad]['roc_auc'], 3)}, "
+              f"PR-AUC {tr(c['pr_auc'], 3)} ± {tr(cv_std[ad]['pr_auc'], 3)}")
+        aralik = guven[ad]["roc_auc"]
+        print(f"  Test: ROC-AUC {tr(t['roc_auc'], 3)} (%95 aralık {tr(aralik[0], 3)}–{tr(aralik[1], 3)}), "
+              f"PR-AUC {tr(t['pr_auc'], 3)}, Brier {tr(t['brier'], 3)}")
         print(f"  Test, eşik 0,50: kesinlik {yuzde(t['esik_0_50']['kesinlik'])}, duyarlılık {yuzde(t['esik_0_50']['duyarlilik'])}, "
               f"F1 {tr(t['esik_0_50']['f1'], 3)}, doğruluk {yuzde(t['esik_0_50']['dogruluk'])}")
         print(f"  Test, eşik {tr(s['esik'], 2)}: kesinlik {yuzde(s['kesinlik'])}, duyarlılık {yuzde(s['duyarlilik'])}, "
@@ -263,7 +316,8 @@ def main():
     print(f"\nRisk grupları (eşik {tr(esik, 2)}): " + ", ".join(
         f"{g} {tr(n)}" for g, n in risk["risk_grubu"].value_counts().reindex(["Yüksek", "Orta", "Düşük"]).items()))
     print(f"Eğitim aralığı dışında değer taşıyan müşteri: {int(risk['egitim_araligi_disinda'].sum())}")
-    print("Yazıldı: outputs/musteri_risk_tablosu.csv, outputs/model_metrikleri.json, outputs/tablolar/grup_bazli_kontrol.csv")
+    print("Yazıldı: outputs/musteri_risk_tablosu.csv, outputs/model_metrikleri.json, outputs/tablolar/grup_bazli_kontrol.csv, "
+          "outputs/tablolar/capraz_dogrulama_katlar.csv")
 
 
 if __name__ == "__main__":

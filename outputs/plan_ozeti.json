@@ -1,29 +1,29 @@
 {
   "onerilen_plan": {
     "butce": 10000,
-    "harcama": 9999.23,
-    "kalan": 0.7700000000004366,
-    "kullanim_orani": 0.999923,
-    "teklif_sunulan_musteri": 223,
+    "harcama": 9999.380000000001,
+    "kalan": 0.6199999999989814,
+    "kullanim_orani": 0.9999380000000001,
+    "teklif_sunulan_musteri": 224,
     "teklif_dagilimi": {
-      "İndirim": 57,
-      "Uygun paket": 16,
+      "İndirim": 52,
+      "Uygun paket": 22,
       "Teknik destek": 150
     },
-    "beklenen_ek_katki": 21584.218353570122,
-    "beklenen_net_fayda": 11584.988353570123,
-    "varsayima_duyarli_teklif": 68,
-    "butce_disinda_kalan": 248
+    "beklenen_ek_katki": 21514.843198249582,
+    "beklenen_net_fayda": 11515.463198249583,
+    "varsayima_duyarli_teklif": 66,
+    "butce_disinda_kalan": 211
   },
   "kisitsiz_plan": {
-    "teklif_sunulan_musteri": 471,
-    "maliyet": 20357.379999999997,
-    "beklenen_net_fayda": 16035.693916737604,
+    "teklif_sunulan_musteri": 435,
+    "maliyet": 18720.945,
+    "beklenen_net_fayda": 15076.330858339508,
     "teklif_dagilimi": {
-      "İndirim": 112,
-      "Uygun paket": 46,
-      "Teknik destek": 313
+      "İndirim": 99,
+      "Uygun paket": 50,
+      "Teknik destek": 286
     }
   },
-  "portfoy_yillik_gelir": 1083614.4
+  "portfoy_yillik_gelir": 1086743.4
 }

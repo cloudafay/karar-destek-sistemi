@@ -7,7 +7,8 @@ from pathlib import Path
 # --- Klasörler ve dosyalar -------------------------------------------------
 KOK = Path(__file__).resolve().parent.parent
 HAM_VERI = KOK / "data" / "raw" / "WA_Fn-UseC_-Telco-Customer-Churn.csv"
-TEMIZ_VERI = KOK / "data" / "processed" / "telco_temiz.csv"
+TEMIZ_VERI = KOK / "data" / "processed" / "telco_temiz.csv"  # temizlenmiş, tüm kayıtlar
+MODELLEME_VERISI = KOK / "data" / "processed" / "telco_modelleme.csv"  # tekrar eden kayıtlar çıkarılmış
 TEKLIF_TABLOSU = KOK / "data" / "processed" / "teklif_senaryosu_SENTETIK.csv"
 CIKTI = KOK / "outputs"
 GRAFIK = CIKTI / "grafikler"
@@ -19,6 +20,10 @@ MODEL_METRIKLERI = CIKTI / "model_metrikleri.json"
 KAMPANYA_LISTESI = CIKTI / "kampanya_listesi.csv"
 KARAR_KAYDI = CIKTI / "karar_kaydi.csv"
 PLAN_OZETI = CIKTI / "plan_ozeti.json"
+TEKRAR_OZETI = CIKTI / "tekrar_kayit_ozeti.json"
+TEKRAR_KAYITLAR = TABLO / "tekrar_eden_kayitlar.csv"
+CV_TABLOSU = TABLO / "capraz_dogrulama_katlar.csv"
+SHAP_OZETI = CIKTI / "shap_ozeti.json"
 RAPOR = DOKUMAN / "KDS_Proje_Raporu.docx"
 EKRAN_GORUNTUSU = DOKUMAN / "yonetici_ekrani.png"
 
@@ -27,12 +32,16 @@ EKRAN_GORUNTUSU = DOKUMAN / "yonetici_ekrani.png"
 INDIRILEN_KAYNAK = "Kaggle (https://www.kaggle.com/datasets/blastchar/telco-customer-churn)"
 BEKLENEN_SATIR, BEKLENEN_SUTUN = 7043, 21  # kaynak açıklamasındaki boyut
 RASTGELE_TOHUM = 42
-TEST_ORANI = 0.20
-CV_KAT = 5
+TEST_ORANI = 0.20  # %80 eğitim, %20 test
+CV_KAT = 5         # eğitim kısmında (%80) uygulanan çapraz doğrulamanın kat sayısı
+BOOTSTRAP_TEKRAR = 1000  # test kısmının (%20) güven aralıkları için yeniden örnekleme sayısı
 
 HEDEF = "Churn"
 SAYISAL = ["tenure", "MonthlyCharges", "TotalCharges"]
-KATEGORIK = [
+# Cinsiyet ve yaş grubu (65 yaş ve üzeri mi), ön sunumdaki öğretim elemanı geri bildirimi üzerine model girdisine
+# eklendi. Ayrımcılık riskine karşı modelin bu gruplarda dengeli çalışıp çalışmadığı ayrıca denetlenir (GRUP_KONTROL).
+DEMOGRAFIK = ["gender", "SeniorCitizen"]
+KATEGORIK = DEMOGRAFIK + [
     "PhoneService", "MultipleLines", "InternetService", "OnlineSecurity",
     "OnlineBackup", "DeviceProtection", "TechSupport", "StreamingTV",
     "StreamingMovies", "Contract", "PaperlessBilling", "PaymentMethod",
@@ -40,12 +49,14 @@ KATEGORIK = [
 # Model girdisi olmayan sütunlar ve gerekçeleri
 MODEL_DISI = {
     "customerID": "Yalnızca kayıt eşleştirme ve tekrar kontrolü içindir.",
-    "gender": "Demografik alan; ayrımcılık riski nedeniyle girdi değildir, yalnızca grup bazlı kontrolde kullanılır.",
-    "SeniorCitizen": "Demografik alan; ayrımcılık riski nedeniyle girdi değildir, yalnızca grup bazlı kontrolde kullanılır.",
-    "Partner": "Demografik alan; iş gerekçesi zayıf olduğu için kullanılmaz.",
-    "Dependents": "Demografik alan; iş gerekçesi zayıf olduğu için kullanılmaz.",
+    "Partner": "Hane bilgisi; iş gerekçesi zayıf olduğu için kullanılmaz.",
+    "Dependents": "Hane bilgisi; iş gerekçesi zayıf olduğu için kullanılmaz.",
 }
-GRUP_KONTROL = ["gender", "SeniorCitizen"]
+GRUP_KONTROL = DEMOGRAFIK
+
+# Tekrar eden kayıt: bu sütunlar dışındaki bütün özellikleri birebir aynı olan kayıtlar.
+# (Kimlik her kayıtta farklıdır; etiket ise çelişip çelişmediğini görmek için ayrıca karşılaştırılır.)
+TEKRAR_ANAHTARI_HARIC = ["customerID", HEDEF, "TotalCharges_dolduruldu"]
 
 # Keşifsel analizde ve risk işaretlerinde kullanılan aralıklar
 SURE_SINIR, SURE_ETIKET = [-1, 12, 24, 48, 72], ["0–12 ay", "13–24 ay", "25–48 ay", "49–72 ay"]
@@ -60,11 +71,11 @@ UCRET_ETIKET = ["35'ten az", "35–55", "55–75", "75–95", "95 ve üzeri"]
 PARA = "$"            # veri setindeki ücretlerin birimi
 UFUK_AY = 12          # elde tutulan müşterinin katkısının hesaplandığı dönem
 KATKI_MARJI = 0.50    # aylık ücretin katkı kârına dönen payı
-# Bütçe: sınırsız bütçeyle en iyi planın maliyetinin (yaklaşık 20.400) kabaca yarısı. Bu düzeyde
-# bütçe gerçekten kısıtlar ve üç teklif türü de plana girer.
+# Bütçe: sınırsız bütçeyle en iyi planın maliyetinin kabaca yarısı olacak biçimde seçilmiş yuvarlak bir değerdir.
+# Portföy büyüklüğü değişirse (ör. TEST_ORANI) bu oran da değişir; güncel oran raporun 8.2. bölümünde
+# hesaplanarak yazılır.
 BUTCE = 10_000
-# Kapasite: sınırsız olsa yaklaşık 310 müşteriye destek önerilir; sınır bunun yarısı kadardır.
-DESTEK_KAPASITESI = 150  # teknik destek ekibinin dönemde bakabileceği müşteri sayısı
+DESTEK_KAPASITESI = 150  # teknik destek ekibinin dönemde bakabileceği müşteri sayısı (aynı not geçerli)
 
 TEKLIF_YOK = "Teklif yok"
 INDIRIM = "İndirim"

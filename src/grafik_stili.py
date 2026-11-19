@@ -19,6 +19,9 @@ EKSEN = "#c3c2b7"
 # Renk körlüğü denetiminden geçmiş kategorik sıra; seriler bu sırayla renk alır.
 SERI = ["#2a78d6", "#eb6834", "#1baf7a"]
 ACIK_MAVI = "#cde2fb"
+ACIK_RENK_TURETILMIS = "#9ec5f4"  # tek başına yorumlanmaması gereken çubuklar için açık mavi (mavi eğrisinin 200. adımı)
+# İki uçlu (artıran / azaltan) gösterimler için: paletin sıcak–soğuk ayrışan çifti.
+ARTIRAN, AZALTAN = "#e34948", "#2a78d6"
 
 plt.rcParams.update({
     "font.family": ["Segoe UI", "DejaVu Sans"],
@@ -86,8 +89,11 @@ def _cubuk_ciz(ax, konum, deger, yatay, renk, kalinlik_px=22, yaricap_px=4):
 
 
 def cubuk_grafigi(etiketler, degerler, baslik, alt_baslik, dosya_adi, yatay=True,
-                  bicim=yuzde, eksen_bicimi=YUZDE_EKSENI, referans=None, referans_etiketi=None):
-    """Tek serili çubuk grafik. Sırasız kategoriler yatay, sıralı aralıklar dikey çizilir."""
+                  bicim=yuzde, eksen_bicimi=YUZDE_EKSENI, referans=None, referans_etiketi=None, renkler=None):
+    """Tek serili çubuk grafik. Sırasız kategoriler yatay, sıralı aralıklar dikey çizilir.
+
+    `renkler` verilirse her çubuk kendi rengini alır (ör. işarete göre: artıran / azaltan).
+    """
     n = len(etiketler)
     degerler = [float(d) for d in degerler]
     en_kucuk, en_buyuk = min(0, *degerler), max(0, *degerler)
@@ -116,7 +122,7 @@ def cubuk_grafigi(etiketler, degerler, baslik, alt_baslik, dosya_adi, yatay=True
 
     fig.canvas.draw()  # piksel ölçülerinin kesinleşmesi için
     for i, deger in enumerate(degerler):
-        _cubuk_ciz(ax, i, deger, yatay, SERI[0])
+        _cubuk_ciz(ax, i, deger, yatay, renkler[i] if renkler else SERI[0])
         if yatay:
             ax.annotate(bicim(deger), (deger, i), xytext=(6 if deger >= 0 else -6, 0), textcoords="offset points",
                         va="center", ha="left" if deger >= 0 else "right")

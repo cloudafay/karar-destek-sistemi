@@ -5,10 +5,10 @@ Bu dosya `src/veri_hazirlama.py` tarafından üretilir; elle düzenlemeyin.
 | Sütun | Açıklama | Tip | Değerler | Modeldeki rolü |
 |---|---|---|---|---|
 | customerID | Müşteri kimliği | metin | 7.043 benzersiz kod | Girdi değil. Yalnızca kayıt eşleştirme ve tekrar kontrolü içindir. |
-| gender | Cinsiyet | kategori | Female, Male | Girdi değil. Demografik alan; ayrımcılık riski nedeniyle girdi değildir, yalnızca grup bazlı kontrolde kullanılır. |
-| SeniorCitizen | 65 yaş ve üzeri mi (1 = evet) | kategori | 0, 1 | Girdi değil. Demografik alan; ayrımcılık riski nedeniyle girdi değildir, yalnızca grup bazlı kontrolde kullanılır. |
-| Partner | Eşi/partneri var mı | kategori | No, Yes | Girdi değil. Demografik alan; iş gerekçesi zayıf olduğu için kullanılmaz. |
-| Dependents | Bakmakla yükümlü olduğu kişi var mı | kategori | No, Yes | Girdi değil. Demografik alan; iş gerekçesi zayıf olduğu için kullanılmaz. |
+| gender | Cinsiyet | kategori | Female, Male | Girdi. |
+| SeniorCitizen | 65 yaş ve üzeri mi (1 = evet) | kategori | 0, 1 | Girdi. |
+| Partner | Eşi/partneri var mı | kategori | No, Yes | Girdi değil. Hane bilgisi; iş gerekçesi zayıf olduğu için kullanılmaz. |
+| Dependents | Bakmakla yükümlü olduğu kişi var mı | kategori | No, Yes | Girdi değil. Hane bilgisi; iş gerekçesi zayıf olduğu için kullanılmaz. |
 | tenure | Müşterinin şirkette bulunduğu ay sayısı | sayı | 0,00 – 72,00 | Girdi. |
 | PhoneService | Telefon hizmeti var mı | kategori | No, Yes | Girdi. |
 | MultipleLines | Birden fazla hattı var mı | kategori | No, No phone service, Yes | Girdi. |

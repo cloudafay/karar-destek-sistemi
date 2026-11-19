@@ -3,6 +3,7 @@
 Çalıştırma:  py src/veri_hazirlama.py
 """
 import hashlib
+import json
 from datetime import datetime
 
 import pandas as pd
@@ -75,7 +76,52 @@ def temizle(ham):
     return df
 
 
-def kalite_raporu_yaz(kontrol, temiz):
+def tekrar_anahtari(df):
+    """Bir kaydın "aynı" sayılması için karşılaştırılan sütunlar: kimlik ve etiket hariç bütün özellikler."""
+    return [sutun for sutun in df.columns if sutun not in A.TEKRAR_ANAHTARI_HARIC]
+
+
+def tekrar_kayitlari_ayikla(df):
+    """Özellikleri birebir aynı olan kayıt gruplarından ilkini (dosya sırasına göre) tutar, kalanları çıkarır.
+
+    Döndürür: (modelleme verisi, özet sözlüğü, çıkarılan kayıtlar tablosu).
+    Etiketi çelişen gruplarda da ilk kayıt tutulur; çelişki ayrıca sayılır ve raporlanır.
+    """
+    anahtar = tekrar_anahtari(df)
+    df = df.assign(_grup=df.groupby(anahtar, sort=False, dropna=False).ngroup())
+    tekrar = df.duplicated(subset=anahtar, keep="first")
+    tutulan = df[~tekrar].set_index("_grup")
+    cikarilan = df[tekrar].assign(
+        korunan_kimlik=lambda d: d["_grup"].map(tutulan["customerID"]),
+        korunan_etiket=lambda d: d["_grup"].map(tutulan[A.HEDEF]),
+    )
+    cikarilan["etiket_ayni_mi"] = cikarilan[A.HEDEF] == cikarilan["korunan_etiket"]
+
+    grup_boyutu = df.groupby("_grup").size()
+    tekrar_gruplari = grup_boyutu[grup_boyutu > 1].index
+    etiket_sayisi = df[df["_grup"].isin(tekrar_gruplari)].groupby("_grup")[A.HEDEF].nunique()
+    modelleme = df[~tekrar].drop(columns="_grup").reset_index(drop=True)
+    ozet = {
+        "anahtar_sutunlari": anahtar,
+        "kayit_oncesi": len(df),
+        "kayit_sonrasi": len(modelleme),
+        "tekrar_grubu": int(len(tekrar_gruplari)),
+        "gruplardaki_toplam_kayit": int(grup_boyutu[tekrar_gruplari].sum()),
+        "cikarilan_kayit": int(tekrar.sum()),
+        "etiketi_celisen_grup": int((etiket_sayisi > 1).sum()),
+        "etiket_dahil_birebir_ayni": int(df.duplicated(subset=anahtar + [A.HEDEF]).sum()),
+        "cikarilan_etiketi_ayni": int(cikarilan["etiket_ayni_mi"].sum()),
+        "cikarilan_etiketi_farkli": int((~cikarilan["etiket_ayni_mi"]).sum()),
+        "cikarilan_tenure": sorted(int(t) for t in cikarilan["tenure"].unique()),
+        "cikarilan_ayrilan": int(cikarilan[A.HEDEF].eq("Yes").sum()),
+        "ayni_kimlik": int(df["customerID"].duplicated().sum()),
+    }
+    sutunlar = ["customerID", "korunan_kimlik", "tenure", "MonthlyCharges", "Contract", "InternetService", A.HEDEF,
+                "korunan_etiket", "etiket_ayni_mi"]
+    return modelleme, ozet, cikarilan[sutunlar].reset_index(drop=True)
+
+
+def kalite_raporu_yaz(kontrol, temiz, tekrar):
     dosya = A.HAM_VERI
     ozet = hashlib.sha256(dosya.read_bytes()).hexdigest()
     tarih = datetime.fromtimestamp(dosya.stat().st_mtime).strftime("%d.%m.%Y %H:%M")
@@ -115,7 +161,18 @@ def kalite_raporu_yaz(kontrol, temiz):
         f"- Boş {kontrol['bos_toplam_ucret']} TotalCharges değeri 0 ile dolduruldu "
         "(hepsi tenure = 0 olan, henüz faturası oluşmamış müşteriler). "
         "Bu kayıtlar `TotalCharges_dolduruldu` sütunuyla işaretlendi.",
-        "- Satır silinmedi; ham dosya değiştirilmedi.",
+        "- Temizleme sırasında satır silinmedi; ham dosya değiştirilmedi.",
+        "",
+        "## Tekrar eden kayıtlar",
+        "",
+        f"- Karşılaştırılan sütunlar: kimlik ve etiket dışındaki {len(tekrar['anahtar_sutunlari'])} özellik.",
+        f"- {tr(tekrar['tekrar_grubu'])} grupta toplam {tr(tekrar['gruplardaki_toplam_kayit'])} kayıt birebir aynı özellikleri taşıyor; "
+        f"her gruptan ilk kayıt tutulup {tr(tekrar['cikarilan_kayit'])} kayıt çıkarıldı "
+        f"({tr(tekrar['cikarilan_etiketi_ayni'])} tanesinin etiketi tutulan kayıtla aynı, "
+        f"{tr(tekrar['cikarilan_etiketi_farkli'])} tanesinin farklı; etiketi çelişen grup sayısı {tr(tekrar['etiketi_celisen_grup'])}).",
+        f"- Çıkarılan kayıtların tenure değerleri: {', '.join(str(t) for t in tekrar['cikarilan_tenure'])} ay.",
+        f"- Modelleme verisi: {tr(tekrar['kayit_sonrasi'])} kayıt (`data/processed/telco_modelleme.csv`). "
+        "Çıkarılan kayıtların listesi `outputs/tablolar/tekrar_eden_kayitlar.csv` dosyasındadır.",
         "",
         "## Sayısal alanların özeti (temiz veri)",
         "",
@@ -166,15 +223,26 @@ def main():
     kontrol = kalite_kontrolu(ham)
     temiz = temizle(ham)
 
+    modelleme, tekrar, cikarilan = tekrar_kayitlari_ayikla(temiz)
+    # Doğrulama: çıkarma sonrasında aynı özelliklere sahip iki kayıt kalmamış olmalı.
+    assert not modelleme.duplicated(subset=tekrar_anahtari(modelleme)).any()
+
     A.TEMIZ_VERI.parent.mkdir(parents=True, exist_ok=True)
+    A.TABLO.mkdir(parents=True, exist_ok=True)
     temiz.to_csv(A.TEMIZ_VERI, index=False)
-    kalite_raporu_yaz(kontrol, temiz)
+    modelleme.to_csv(A.MODELLEME_VERISI, index=False)
+    cikarilan.to_csv(A.TEKRAR_KAYITLAR, index=False, encoding="utf-8-sig")
+    A.TEKRAR_OZETI.write_text(json.dumps(tekrar, ensure_ascii=False, indent=2), encoding="utf-8")
+    kalite_raporu_yaz(kontrol, temiz, tekrar)
     veri_sozlugu_yaz(temiz)
 
     churn = kontrol["churn_dagilimi"]
     print(f"Boyut: {tr(kontrol['satir'])} satır × {kontrol['sutun']} sütun")
     print(f"Tekrar eden customerID: {kontrol['tekrar_eden_kimlik']}")
     print(f"Boş TotalCharges: {kontrol['bos_toplam_ucret']} (tenure değeri: {kontrol['bos_toplam_ucret_tenure']})")
+    print(f"Tekrar eden kayıt (kimlik ve etiket dışındaki {len(tekrar['anahtar_sutunlari'])} özellik aynı): "
+          f"{tr(tekrar['tekrar_grubu'])} grup, {tr(tekrar['cikarilan_kayit'])} kayıt çıkarıldı "
+          f"(etiketi çelişen grup: {tr(tekrar['etiketi_celisen_grup'])}); modelleme verisi {tr(tekrar['kayit_sonrasi'])} kayıt")
     print(f"Churn: Yes = {tr(churn['Yes'])}, No = {tr(churn['No'])} ({yuzde(churn['Yes'] / kontrol['satir'])})")
     print(f"Yazıldı: {A.TEMIZ_VERI.relative_to(A.KOK)}, outputs/veri_kalite_raporu.md, docs/veri_sozlugu.md")
 

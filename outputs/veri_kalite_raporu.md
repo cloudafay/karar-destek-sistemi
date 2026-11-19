@@ -24,7 +24,14 @@ Bu dosya `src/veri_hazirlama.py` tarafından üretilir; elle düzenlemeyin.
 - Tüm metin hücrelerinin baş ve sonundaki boşluklar silindi.
 - tenure ve SeniorCitizen tam sayıya, MonthlyCharges ve TotalCharges ondalık sayıya çevrildi.
 - Boş 11 TotalCharges değeri 0 ile dolduruldu (hepsi tenure = 0 olan, henüz faturası oluşmamış müşteriler). Bu kayıtlar `TotalCharges_dolduruldu` sütunuyla işaretlendi.
-- Satır silinmedi; ham dosya değiştirilmedi.
+- Temizleme sırasında satır silinmedi; ham dosya değiştirilmedi.
+
+## Tekrar eden kayıtlar
+
+- Karşılaştırılan sütunlar: kimlik ve etiket dışındaki 19 özellik.
+- 33 grupta toplam 73 kayıt birebir aynı özellikleri taşıyor; her gruptan ilk kayıt tutulup 40 kayıt çıkarıldı (19 tanesinin etiketi tutulan kayıtla aynı, 21 tanesinin farklı; etiketi çelişen grup sayısı 18).
+- Çıkarılan kayıtların tenure değerleri: 1 ay.
+- Modelleme verisi: 7.003 kayıt (`data/processed/telco_modelleme.csv`). Çıkarılan kayıtların listesi `outputs/tablolar/tekrar_eden_kayitlar.csv` dosyasındadır.
 
 ## Sayısal alanların özeti (temiz veri)
 

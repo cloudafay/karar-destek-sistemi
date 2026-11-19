@@ -1,0 +1,515 @@
+{
+  "shap_surumu": "0.54.1",
+  "denetim": {
+    "dogrusal_formul_farki": 0.0,
+    "toplamsallik_farki": 1.7763568394002505e-15,
+    "agac_toplamsallik_farki": 3.3306690738754696e-16
+  },
+  "korelasyon": {
+    "lojistik_shap__agac_shap": 0.713946984241203,
+    "lojistik_shap__izin_onemi": 0.8553921568627452,
+    "agac_shap__izin_onemi": 0.546249592433252
+  },
+  "ilk5": {
+    "lojistik_shap": [
+      "tenure",
+      "Contract",
+      "TotalCharges",
+      "InternetService",
+      "OnlineSecurity"
+    ],
+    "agac_shap": [
+      "Contract",
+      "InternetService",
+      "tenure",
+      "MonthlyCharges",
+      "PaymentMethod"
+    ],
+    "izin_onemi": [
+      "tenure",
+      "Contract",
+      "TotalCharges",
+      "InternetService",
+      "TechSupport"
+    ]
+  },
+  "bagimlilik": {
+    "aylik_ucret_r2_hizmetlerle": 0.998829405132478,
+    "toplam_ucret_korelasyonu_sure_x_ucret": 0.999554718777944,
+    "birebir_ayni_bir_sicak_sutun": 7,
+    "bir_sicak_sutun_sayisi": 42
+  },
+  "ornek_musteri": {
+    "kimlik": "5150-ITWWB",
+    "olasilik": 0.8503986268150568,
+    "taban_log_oran": -1.7547931620926,
+    "toplam_katki": 3.4925241298252336,
+    "log_oran": 1.7377309677326336,
+    "grup_katkilari": [
+      {
+        "grup": "Süre ve ücret",
+        "ozet": "3 ay · aylık 94,85 $ · toplam 336 $",
+        "shap": 1.3048520313591836
+      },
+      {
+        "grup": "Hizmet paketi",
+        "ozet": "fiber · güvenlik yok · destek yok",
+        "shap": 1.0591318352968435
+      },
+      {
+        "grup": "Sözleşme",
+        "ozet": "aylık (taahhütsüz)",
+        "shap": 0.5106073667637022
+      },
+      {
+        "grup": "Faturalandırma ve ödeme",
+        "ozet": "elektronik çek",
+        "shap": 0.3981718957221171
+      },
+      {
+        "grup": "Demografik",
+        "ozet": "erkek · 65 yaş ve üzeri",
+        "shap": 0.2197610006833875
+      }
+    ],
+    "degisken_katkilari": {
+      "Abonelik süresi": 1.6498568109437217,
+      "Aylık ücret": 0.2094763192038286,
+      "Toplam ücret": -0.5544810987883669
+    }
+  },
+  "gruplar": {
+    "Süre ve ücret": [
+      "tenure",
+      "MonthlyCharges",
+      "TotalCharges"
+    ],
+    "Hizmet paketi": [
+      "PhoneService",
+      "MultipleLines",
+      "InternetService",
+      "OnlineSecurity",
+      "OnlineBackup",
+      "DeviceProtection",
+      "TechSupport",
+      "StreamingTV",
+      "StreamingMovies"
+    ],
+    "Sözleşme": [
+      "Contract"
+    ],
+    "Faturalandırma ve ödeme": [
+      "PaperlessBilling",
+      "PaymentMethod"
+    ],
+    "Demografik": [
+      "gender",
+      "SeniorCitizen"
+    ]
+  },
+  "turetilmis": [
+    "MonthlyCharges",
+    "TotalCharges"
+  ],
+  "grup_onemi": [
+    {
+      "grup": "Süre ve ücret",
+      "lojistik_shap": 0.7899331217,
+      "agac_shap": 0.0783334162,
+      "izin_onemi": 0.1018121128,
+      "lojistik_shap_pay": 0.3632055221,
+      "lojistik_shap_sira": 1,
+      "agac_shap_pay": 0.2374355332,
+      "agac_shap_sira": 3,
+      "izin_onemi_pay": 0.5351731766,
+      "izin_onemi_sira": 1
+    },
+    {
+      "grup": "Sözleşme",
+      "lojistik_shap": 0.5673955279,
+      "agac_shap": 0.149639257,
+      "izin_onemi": 0.0392961439,
+      "lojistik_shap_pay": 0.26088435,
+      "lojistik_shap_sira": 2,
+      "agac_shap_pay": 0.4535698619,
+      "agac_shap_sira": 1,
+      "izin_onemi_pay": 0.2065593333,
+      "izin_onemi_sira": 3
+    },
+    {
+      "grup": "Hizmet paketi",
+      "lojistik_shap": 0.5285999605,
+      "agac_shap": 0.0821753239,
+      "izin_onemi": 0.0417952482,
+      "lojistik_shap_pay": 0.2430464294,
+      "lojistik_shap_sira": 3,
+      "agac_shap_pay": 0.2490806963,
+      "agac_shap_sira": 2,
+      "izin_onemi_pay": 0.2196958214,
+      "izin_onemi_sira": 2
+    },
+    {
+      "grup": "Faturalandırma ve ödeme",
+      "lojistik_shap": 0.2214089862,
+      "agac_shap": 0.0197664649,
+      "izin_onemi": 0.0068025445,
+      "lojistik_shap_pay": 0.1018022466,
+      "lojistik_shap_sira": 4,
+      "agac_shap_pay": 0.0599139085,
+      "agac_shap_sira": 4,
+      "izin_onemi_pay": 0.0357574288,
+      "izin_onemi_sira": 4
+    },
+    {
+      "grup": "Demografik",
+      "lojistik_shap": 0.0675553322,
+      "agac_shap": 0.0,
+      "izin_onemi": 0.000535385,
+      "lojistik_shap_pay": 0.0310614519,
+      "lojistik_shap_sira": 5,
+      "agac_shap_pay": 0.0,
+      "agac_shap_sira": 5,
+      "izin_onemi_pay": 0.00281424,
+      "izin_onemi_sira": 5
+    }
+  ],
+  "toplam_ucret_celiskisi": [
+    {
+      "ceyrek": "en düşük çeyrek",
+      "musteri": 351,
+      "kayip_orani": 0.4501424501,
+      "ortalama_shap": -0.6101272095
+    },
+    {
+      "ceyrek": "2. çeyrek",
+      "musteri": 350,
+      "kayip_orani": 0.26,
+      "ortalama_shap": -0.4139785227
+    },
+    {
+      "ceyrek": "3. çeyrek",
+      "musteri": 350,
+      "kayip_orani": 0.2342857143,
+      "ortalama_shap": 0.0272343789
+    },
+    {
+      "ceyrek": "en yüksek çeyrek",
+      "musteri": 350,
+      "kayip_orani": 0.1114285714,
+      "ortalama_shap": 0.984726745
+    }
+  ],
+  "degisken_onemi": [
+    {
+      "degisken": "tenure",
+      "degisken_adi": "Abonelik süresi",
+      "lojistik_shap": 1.2607107295,
+      "agac_shap": 0.0635229661,
+      "izin_onemi": 0.19908739,
+      "lojistik_pay": 0.3089013517,
+      "agac_pay": 0.1604797031,
+      "lojistik_shap_sira": 1,
+      "agac_shap_sira": 3,
+      "izin_onemi_sira": 1
+    },
+    {
+      "degisken": "Contract",
+      "degisken_adi": "Sözleşme",
+      "lojistik_shap": 0.5673955279,
+      "agac_shap": 0.149639257,
+      "izin_onemi": 0.0391382459,
+      "lojistik_pay": 0.1390241563,
+      "agac_pay": 0.3780375037,
+      "lojistik_shap_sira": 2,
+      "agac_shap_sira": 1,
+      "izin_onemi_sira": 2
+    },
+    {
+      "degisken": "TotalCharges",
+      "degisken_adi": "Toplam ücret",
+      "lojistik_shap": 0.545792648,
+      "agac_shap": 0.017190956,
+      "izin_onemi": 0.0177028338,
+      "lojistik_pay": 0.1337309842,
+      "agac_pay": 0.0434299542,
+      "lojistik_shap_sira": 3,
+      "agac_shap_sira": 6,
+      "izin_onemi_sira": 3
+    },
+    {
+      "degisken": "InternetService",
+      "degisken_adi": "İnternet",
+      "lojistik_shap": 0.2457803045,
+      "agac_shap": 0.0755592286,
+      "izin_onemi": 0.0061200094,
+      "lojistik_pay": 0.0602214818,
+      "agac_pay": 0.1908872226,
+      "lojistik_shap_sira": 4,
+      "agac_shap_sira": 2,
+      "izin_onemi_sira": 4
+    },
+    {
+      "degisken": "OnlineSecurity",
+      "degisken_adi": "Çevrimiçi güvenlik",
+      "lojistik_shap": 0.1994179806,
+      "agac_shap": 0.0018820715,
+      "izin_onemi": 0.0031392595,
+      "lojistik_pay": 0.0488617114,
+      "agac_pay": 0.0047547257,
+      "lojistik_shap_sira": 5,
+      "agac_shap_sira": 13,
+      "izin_onemi_sira": 6
+    },
+    {
+      "degisken": "MonthlyCharges",
+      "degisken_adi": "Aylık ücret",
+      "lojistik_shap": 0.1822962498,
+      "agac_shap": 0.0250971332,
+      "izin_onemi": 0.0012277942,
+      "lojistik_pay": 0.0446665176,
+      "agac_pay": 0.063403533,
+      "lojistik_shap_sira": 6,
+      "agac_shap_sira": 4,
+      "izin_onemi_sira": 11
+    },
+    {
+      "degisken": "PaperlessBilling",
+      "degisken_adi": "Kâğıtsız fatura",
+      "lojistik_shap": 0.172567088,
+      "agac_shap": 0.003383199,
+      "izin_onemi": 0.0019122517,
+      "lojistik_pay": 0.0422826628,
+      "agac_pay": 0.0085470627,
+      "lojistik_shap_sira": 7,
+      "agac_shap_sira": 11,
+      "izin_onemi_sira": 7
+    },
+    {
+      "degisken": "PaymentMethod",
+      "degisken_adi": "Ödeme",
+      "lojistik_shap": 0.1703856663,
+      "agac_shap": 0.0183975215,
+      "izin_onemi": 0.0018158702,
+      "lojistik_pay": 0.0417481674,
+      "agac_pay": 0.0464781317,
+      "lojistik_shap_sira": 8,
+      "agac_shap_sira": 5,
+      "izin_onemi_sira": 8
+    },
+    {
+      "degisken": "TechSupport",
+      "degisken_adi": "Teknik destek",
+      "lojistik_shap": 0.1663267983,
+      "agac_shap": 0.0,
+      "izin_onemi": 0.0042622836,
+      "lojistik_pay": 0.0407536571,
+      "agac_pay": 0.0,
+      "lojistik_shap_sira": 9,
+      "agac_shap_sira": 14,
+      "izin_onemi_sira": 5
+    },
+    {
+      "degisken": "MultipleLines",
+      "degisken_adi": "Çoklu hat",
+      "lojistik_shap": 0.1249925574,
+      "agac_shap": 0.0032210369,
+      "izin_onemi": 0.0007073514,
+      "lojistik_pay": 0.0306258756,
+      "agac_pay": 0.0081373885,
+      "lojistik_shap_sira": 10,
+      "agac_shap_sira": 12,
+      "izin_onemi_sira": 12
+    },
+    {
+      "degisken": "OnlineBackup",
+      "degisken_adi": "Çevrimiçi yedekleme",
+      "lojistik_shap": 0.097728716,
+      "agac_shap": 0.0154795897,
+      "izin_onemi": 0.0014998121,
+      "lojistik_pay": 0.0239456457,
+      "agac_pay": 0.0391064856,
+      "lojistik_shap_sira": 11,
+      "agac_shap_sira": 7,
+      "izin_onemi_sira": 10
+    },
+    {
+      "degisken": "StreamingTV",
+      "degisken_adi": "TV yayını",
+      "lojistik_shap": 0.078506332,
+      "agac_shap": 0.0040976971,
+      "izin_onemi": -0.0009355039,
+      "lojistik_pay": 0.0192357465,
+      "agac_pay": 0.0103521177,
+      "lojistik_shap_sira": 12,
+      "agac_shap_sira": 10,
+      "izin_onemi_sira": 17
+    },
+    {
+      "degisken": "StreamingMovies",
+      "degisken_adi": "Film yayını",
+      "lojistik_shap": 0.0777153952,
+      "agac_shap": 0.0091067444,
+      "izin_onemi": -0.0006594664,
+      "lojistik_pay": 0.01904195,
+      "agac_pay": 0.0230066027,
+      "lojistik_shap_sira": 13,
+      "agac_shap_sira": 9,
+      "izin_onemi_sira": 16
+    },
+    {
+      "degisken": "PhoneService",
+      "degisken_adi": "Telefon hizmeti",
+      "lojistik_shap": 0.0724471876,
+      "agac_shap": 0.0092543763,
+      "izin_onemi": 0.0017592471,
+      "lojistik_pay": 0.0177511253,
+      "agac_pay": 0.0233795689,
+      "lojistik_shap_sira": 14,
+      "agac_shap_sira": 8,
+      "izin_onemi_sira": 9
+    },
+    {
+      "degisken": "SeniorCitizen",
+      "degisken_adi": "Yaş grubu",
+      "lojistik_shap": 0.0677625942,
+      "agac_shap": 0.0,
+      "izin_onemi": 0.0005697259,
+      "lojistik_pay": 0.0166032988,
+      "agac_pay": 0.0,
+      "lojistik_shap_sira": 15,
+      "agac_shap_sira": 14,
+      "izin_onemi_sira": 13
+    },
+    {
+      "degisken": "DeviceProtection",
+      "degisken_adi": "Cihaz koruma",
+      "lojistik_shap": 0.0415128385,
+      "agac_shap": 0.0,
+      "izin_onemi": 0.0005433367,
+      "lojistik_pay": 0.0101715418,
+      "agac_pay": 0.0,
+      "lojistik_shap_sira": 16,
+      "agac_shap_sira": 14,
+      "izin_onemi_sira": 14
+    },
+    {
+      "degisken": "gender",
+      "degisken_adi": "Cinsiyet",
+      "lojistik_shap": 0.009934332,
+      "agac_shap": 0.0,
+      "izin_onemi": -0.0001587718,
+      "lojistik_pay": 0.0024341258,
+      "agac_pay": 0.0,
+      "lojistik_shap_sira": 17,
+      "agac_shap_sira": 14,
+      "izin_onemi_sira": 15
+    }
+  ],
+  "deger_yonu": [
+    {
+      "degisken": "tenure",
+      "grup": "0–12 ay",
+      "etiket": "Abonelik süresi: 0–12 ay",
+      "musteri": 461,
+      "ortalama_shap": 1.5528425752
+    },
+    {
+      "degisken": "tenure",
+      "grup": "13–24 ay",
+      "etiket": "Abonelik süresi: 13–24 ay",
+      "musteri": 199,
+      "ortalama_shap": 0.7791935867
+    },
+    {
+      "degisken": "tenure",
+      "grup": "25–48 ay",
+      "etiket": "Abonelik süresi: 25–48 ay",
+      "musteri": 273,
+      "ortalama_shap": -0.230221706
+    },
+    {
+      "degisken": "tenure",
+      "grup": "49–72 ay",
+      "etiket": "Abonelik süresi: 49–72 ay",
+      "musteri": 468,
+      "ortalama_shap": -1.696998883
+    },
+    {
+      "degisken": "Contract",
+      "grup": "Month-to-month",
+      "etiket": "Sözleşme: aylık (taahhütsüz)",
+      "musteri": 762,
+      "ortalama_shap": 0.5106073668
+    },
+    {
+      "degisken": "Contract",
+      "grup": "One year",
+      "etiket": "Sözleşme: 1 yıllık",
+      "musteri": 287,
+      "ortalama_shap": -0.2273135681
+    },
+    {
+      "degisken": "Contract",
+      "grup": "Two year",
+      "etiket": "Sözleşme: 2 yıllık",
+      "musteri": 352,
+      "ortalama_shap": -0.9676117247
+    },
+    {
+      "degisken": "InternetService",
+      "grup": "Fiber optic",
+      "etiket": "İnternet: fiber",
+      "musteri": 605,
+      "ortalama_shap": 0.2760722154
+    },
+    {
+      "degisken": "InternetService",
+      "grup": "No",
+      "etiket": "İnternet: yok",
+      "musteri": 295,
+      "ortalama_shap": -0.0908600361
+    },
+    {
+      "degisken": "InternetService",
+      "grup": "DSL",
+      "etiket": "İnternet: DSL",
+      "musteri": 501,
+      "ortalama_shap": -0.3004207696
+    },
+    {
+      "degisken": "OnlineSecurity",
+      "grup": "No",
+      "etiket": "Çevrimiçi güvenlik: yok",
+      "musteri": 694,
+      "ortalama_shap": 0.1992260774
+    },
+    {
+      "degisken": "OnlineSecurity",
+      "grup": "No internet service",
+      "etiket": "Çevrimiçi güvenlik: internet yok",
+      "musteri": 295,
+      "ortalama_shap": -0.1107038558
+    },
+    {
+      "degisken": "OnlineSecurity",
+      "grup": "Yes",
+      "etiket": "Çevrimiçi güvenlik: var",
+      "musteri": 412,
+      "ortalama_shap": -0.2632622711
+    },
+    {
+      "degisken": "PaperlessBilling",
+      "grup": "Yes",
+      "etiket": "Kâğıtsız fatura: var",
+      "musteri": 816,
+      "ortalama_shap": 0.1438714687
+    },
+    {
+      "degisken": "PaperlessBilling",
+      "grup": "No",
+      "etiket": "Kâğıtsız fatura: yok",
+      "musteri": 585,
+      "ortalama_shap": -0.2125937979
+    }
+  ]
+}

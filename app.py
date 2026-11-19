@@ -328,13 +328,21 @@ with liste_sekmesi:
 with teknik_sekme:
     st.caption("Bu sekme analistler içindir; karar için gereken bilgi ilk sekmededir.")
     st.subheader("Tahmin modeli")
-    st.markdown(f"Temel model: {metrikler['temel_model']}. Eğitim {tr(metrikler['veri']['egitim'])}, test {tr(metrikler['veri']['test'])} müşteri. "
-                f"Eşik ({tr(esik, 2)}), eğitim verisindeki çapraz doğrulama tahminlerinde F1 skorunu en yüksek yapan değerdir.")
+    tekrar = json.loads(A.TEKRAR_OZETI.read_text(encoding="utf-8")) if A.TEKRAR_OZETI.exists() else None
+    st.markdown(f"Temel model: {metrikler['temel_model']}. Eğitim {tr(metrikler['veri']['egitim'])}, test {tr(metrikler['veri']['test'])} müşteri "
+                f"(%{round((1 - A.TEST_ORANI) * 100)} / %{round(A.TEST_ORANI * 100)}). "
+                + (f"Ayırmadan önce özellikleri birebir aynı olan {tr(tekrar['cikarilan_kayit'])} tekrar eden kayıt çıkarıldı. " if tekrar else "")
+                + f"Eğitim kısmında {A.CV_KAT} katlı iç içe çapraz doğrulama uygulandı; test kısmı yalnızca bir kez kullanıldı. "
+                f"Eşik ({tr(esik, 2)}), eğitim kısmındaki çapraz doğrulama tahminlerinde F1 skorunu en yüksek yapan değerdir.")
     satirlar = []
     for ad, t in metrikler["test"].items():
         secilen = t["secilen_esik"]
-        satirlar.append({"Model": ad, "ROC-AUC (çapraz doğrulama)": tr(metrikler["capraz_dogrulama"][ad]["roc_auc"], 3),
-                         "ROC-AUC (test)": tr(t["roc_auc"], 3), "PR-AUC (test)": tr(t["pr_auc"], 3), "Brier (test)": tr(t["brier"], 3),
+        cv_std = metrikler.get("capraz_dogrulama_std", {}).get(ad, {}).get("roc_auc")
+        cv_metni = tr(metrikler["capraz_dogrulama"][ad]["roc_auc"], 3) + (f" ± {tr(cv_std, 3)}" if cv_std is not None else "")
+        aralik = metrikler.get("test_guven_araligi", {}).get(ad, {}).get("roc_auc")
+        test_metni = tr(t["roc_auc"], 3) + (f" [{tr(aralik[0], 3)}–{tr(aralik[1], 3)}]" if aralik else "")
+        satirlar.append({"Model": ad, "ROC-AUC (çapraz doğrulama, ort. ± std)": cv_metni,
+                         "ROC-AUC (test, %95 aralık)": test_metni, "PR-AUC (test)": tr(t["pr_auc"], 3), "Brier (test)": tr(t["brier"], 3),
                          "Eşik": tr(secilen["esik"], 2), "Kesinlik": yuzde(secilen["kesinlik"]),
                          "Duyarlılık": yuzde(secilen["duyarlilik"]), "F1": tr(secilen["f1"], 3)})
     st.dataframe(pd.DataFrame(satirlar), hide_index=True, width="stretch")
@@ -342,6 +350,16 @@ with teknik_sekme:
     for sutun, dosya in ((g1, "06_roc_pr_egrileri.png"), (g2, "07_kalibrasyon.png")):
         if (A.GRAFIK / dosya).exists():
             sutun.image(str(A.GRAFIK / dosya))
+
+    if A.SHAP_OZETI.exists():
+        st.subheader("Modelin açıklaması (SHAP)")
+        st.caption("SHAP, modelin tahminini değişkenlerin katkılarına ayırır; ayrılmanın nedenini ya da bir teklifin etkisini kanıtlamaz. "
+                   "Aylık ücret ve toplam ücret, abonelik süresi ve hizmetlerden neredeyse tam hesaplanabildiği için tek başına "
+                   "yorumlanmamalı; “Süre ve ücret” grubu birlikte değerlendirilmelidir. Ayrıntı: rapor, Bölüm 6.8.")
+        s1, s2 = st.columns(2)
+        for sutun, dosya in ((s1, "12_shap_grup_onemi.png"), (s2, "14_shap_ornek_musteri.png")):
+            if (A.GRAFIK / dosya).exists():
+                sutun.image(str(A.GRAFIK / dosya))
 
     st.subheader("Senaryoların teknik karşılaştırması")
     st.dataframe(pd.DataFrame({
@@ -372,7 +390,7 @@ with teknik_sekme:
     grup_dosyasi = A.TABLO / "grup_bazli_kontrol.csv"
     if grup_dosyasi.exists():
         st.subheader("Grup bazlı kontrol")
-        st.caption("Cinsiyet ve yaş grubu model girdisi değildir; burada yalnızca sonuçların gruplar arasında nasıl dağıldığı denetlenir.")
+        st.caption("Cinsiyet ve yaş grubu model girdisidir (ön sunum geri bildirimiyle eklendi); burada modelin bu gruplarda dengeli çalışıp çalışmadığı denetlenir.")
         gruplar = pd.read_csv(grup_dosyasi, dtype={"grup": str})
         grup_adi = {"Female": "Kadın", "Male": "Erkek", "0": "65 yaş altı", "1": "65 yaş ve üzeri"}
         st.dataframe(pd.DataFrame({

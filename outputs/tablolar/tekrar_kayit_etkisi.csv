@@ -1,0 +1,4 @@
+﻿duzen,kayit,egitim,test,test_ikizi_19,test_ikizi_celisen_19,cv_sizintisi_19,test_ikizi_15,test_ikizi_celisen_15,cv_sizintisi_15,lojistik_roc_auc,lojistik_pr_auc,agac_roc_auc,agac_pr_auc
+Tüm kayıtlar,7043,5634,1409,13,6,38,20,8,52,0.8418068149525949,0.6302700701440824,0.8348691518768244,0.6313502177792096
+Tekrar eden kayıtlar çıkarıldı (asıl kural),7003,5602,1401,0,0,0,7,3,12,0.839339921881144,0.6379091360189508,0.8278029727108291,0.615106203111172
+Model girdisi aynı olanlar da çıkarıldı (sıkı kural),6988,5590,1398,0,0,0,0,0,0,0.8321865766146054,0.6281147646063734,0.8202076298016041,0.6038466030892397

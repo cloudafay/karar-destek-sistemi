@@ -1,0 +1,41 @@
+﻿customerID,korunan_kimlik,tenure,MonthlyCharges,Contract,InternetService,Churn,korunan_etiket,etiket_ayni_mi
+9117-SHLZX,0887-HJGAR,1,45.7,Month-to-month,DSL,Yes,Yes,True
+1934-SJVJK,1066-JKSGK,1,20.15,Month-to-month,No,Yes,Yes,True
+8605-ITULD,2866-IKBTM,1,19.55,Month-to-month,No,No,No,True
+9804-ICWBG,5875-YPQFJ,1,69.9,Month-to-month,Fiber optic,Yes,Yes,True
+3247-MHJKM,6380-ARCEH,1,20.2,Month-to-month,No,No,No,True
+5996-DAOQL,8262-COGGB,1,20.45,Month-to-month,No,No,No,True
+2668-TZSPS,0673-IGUQO,1,20.45,Month-to-month,No,No,No,True
+5542-TBBWB,5875-YPQFJ,1,69.9,Month-to-month,Fiber optic,No,Yes,False
+2636-ALXXZ,8375-DKEBR,1,69.6,Month-to-month,Fiber optic,Yes,Yes,True
+0426-TIRNE,7243-LCGGZ,1,20.9,Month-to-month,No,Yes,No,False
+9753-OYLBX,2002-MZHWP,1,20.5,Month-to-month,No,No,Yes,False
+7096-UCLNH,3030-ZKIWL,1,20.05,Month-to-month,No,No,No,True
+7239-HZZCX,3930-ZGWVE,1,19.75,Month-to-month,No,Yes,No,False
+5356-RHIPP,8305-VHZBZ,1,20.2,Month-to-month,No,Yes,Yes,True
+2876-VBBBL,0670-KDOMA,1,20.25,Month-to-month,No,Yes,No,False
+1905-OEILC,7551-JOHTI,1,19.5,Month-to-month,No,No,Yes,False
+7434-SHXLS,7243-LCGGZ,1,20.9,Month-to-month,No,Yes,No,False
+4877-EVATK,7698-YFGEZ,1,20.0,Month-to-month,No,Yes,No,False
+4211-MMAZN,8203-XJZRC,1,20.25,Month-to-month,No,Yes,No,False
+0511-JTEOY,8040-MNRTF,1,71.1,Month-to-month,Fiber optic,Yes,No,False
+6654-QGBZZ,3900-AQPHZ,1,19.9,Month-to-month,No,No,Yes,False
+7721-DVEKZ,8329-IBCTI,1,19.65,Month-to-month,No,No,Yes,False
+2275-RBYQS,5692-FPTAH,1,45.4,Month-to-month,DSL,No,Yes,False
+8048-DSDFQ,6380-ARCEH,1,20.2,Month-to-month,No,No,No,True
+3244-DCJWY,1640-PLFMP,1,70.25,Month-to-month,Fiber optic,Yes,No,False
+3785-NRHYR,6141-OOXUQ,1,19.65,Month-to-month,No,No,Yes,False
+8749-CLJXC,3030-ZKIWL,1,20.05,Month-to-month,No,No,No,True
+5049-GLYVG,3976-NLDEZ,1,20.6,Month-to-month,No,Yes,No,False
+9985-MWVIX,2619-WFQWU,1,70.15,Month-to-month,Fiber optic,Yes,Yes,True
+4786-UKSNZ,6380-ARCEH,1,20.2,Month-to-month,No,Yes,No,False
+0328-GRPMV,4702-IOQDC,1,70.1,Month-to-month,Fiber optic,Yes,Yes,True
+1963-VAUKV,3727-JEZTU,1,20.4,Month-to-month,No,Yes,No,False
+7601-WFVZV,1029-QFBEN,1,19.55,Month-to-month,No,No,Yes,False
+2676-ISHSF,9122-UMROB,1,20.3,Month-to-month,No,No,No,True
+1963-SVUCV,5552-ZNFSJ,1,45.3,Month-to-month,DSL,Yes,Yes,True
+1000-AJSLD,1240-KNSEZ,1,20.1,Month-to-month,No,Yes,Yes,True
+7878-RTCZG,3900-AQPHZ,1,19.9,Month-to-month,No,No,Yes,False
+7660-HDPJV,9728-FTTVZ,1,69.2,Month-to-month,Fiber optic,Yes,Yes,True
+0970-QXPXW,8329-IBCTI,1,19.65,Month-to-month,No,No,Yes,False
+6457-GIRWB,3428-XZMAZ,1,69.35,Month-to-month,Fiber optic,Yes,Yes,True
